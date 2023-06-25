@@ -1,4 +1,5 @@
 // main.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,8 +15,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isPause = true;
+  int leftSec = 1500; // 60x25
+  late Timer timer;
+
+  void onTick(Timer timer) {
+    setState(() {
+      leftSec -= 1;
+    });
+  }
+
   void onPressed() {
     setState(() {
+      if (isPause) {
+        timer = Timer.periodic(const Duration(seconds: 1), onTick);
+      } else {
+        timer.cancel();
+      }
       isPause = !isPause;
     });
   }
@@ -30,8 +45,13 @@ class _MyAppState extends State<MyApp> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('25:00',
-                  style: TextStyle(
+              Text(
+                  Duration(seconds: leftSec)
+                      .toString()
+                      .split(".")
+                      .first
+                      .substring(2, 7),
+                  style: const TextStyle(
                       color: Color(0xFFF4EDDB),
                       fontSize: 88,
                       fontWeight: FontWeight.w600)),
