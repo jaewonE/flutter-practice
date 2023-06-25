@@ -13,11 +13,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int count = 0;
-
-  void countUp() {
+  bool isPause = true;
+  void onPressed() {
     setState(() {
-      count += 1;
+      isPause = !isPause;
     });
   }
 
@@ -25,46 +24,35 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$count',
-                  style: const TextStyle(
-                      fontSize: 104, fontWeight: FontWeight.w600),
-                ),
-                const Text(
-                  'Click for count!',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w400),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+        backgroundColor: const Color(0xFFE7626C),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 40,
-                ),
-                child: IconButton(
-                    onPressed: countUp,
-                    icon: const Icon(
-                      Icons.add_box_rounded,
-                      size: 64,
-                      color: Colors.blue,
-                    )),
-              )
+              const Text('25:00',
+                  style: TextStyle(
+                      color: Color(0xFFF4EDDB),
+                      fontSize: 88,
+                      fontWeight: FontWeight.w600)),
+              const SizedBox(height: 24),
+              IconButton(
+                  padding: const EdgeInsets.all(24),
+                  onPressed: onPressed,
+                  icon: Transform.translate(
+                    offset: const Offset(-32, -32),
+                    child: Icon(
+                      isPause
+                          ? Icons.play_circle_outline_outlined
+                          : Icons.pause_circle_outline_outlined,
+                      color: const Color(0xFFF4EDDB),
+                      size: 88,
+                    ),
+                  ))
             ],
-          )
-        ],
-      )),
+          ),
+        ),
+      ),
     );
   }
 }
