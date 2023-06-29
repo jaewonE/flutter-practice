@@ -8,15 +8,15 @@ import 'package:http/http.dart' as http;
 class ApiServices {
   static const baseUrl = 'https://api.openweathermap.org/data/2.5';
 
-  String _coordQueryString(double lat, double lon) =>
-      'lat=$lat&lon=$lon&lang=kr&appid=${dotenv.env['API_KEY']}';
+  static String _coordQueryString(double lat, double lon) =>
+      'lat=$lat&lon=$lon&units=metric&appid=${dotenv.env['API_KEY']}';
 
-  String _cityQueryString(String city, String country) =>
-      'q=$city,$country&lang=kr&appid=${dotenv.env['API_KEY']}';
+  static String _cityQueryString(String city, String country) =>
+      'q=$city,$country&units=metric&appid=${dotenv.env['API_KEY']}';
 
   // Get permission of getting location of user.
   // Return String if user denied or has error.
-  Future<String?> _handleLocationPermission() async {
+  static Future<String?> _handleLocationPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -41,7 +41,7 @@ class ApiServices {
   }
 
   // Get weather by url
-  Future<Weather?> _getWeather({required String url}) async {
+  static Future<Weather?> _getWeather({required String url}) async {
     final res = await http.get(Uri.parse(url));
     if (res.statusCode != 200) return null;
 
@@ -51,7 +51,7 @@ class ApiServices {
   }
 
   // get Forecast by url
-  Future<List<Weather>?> _getForecast({required String url}) async {
+  static Future<List<Weather>?> _getForecast({required String url}) async {
     final res = await http.get(Uri.parse(url));
     if (res.statusCode != 200) return null;
 
@@ -71,13 +71,13 @@ class ApiServices {
   }
 
   // Get weather by latitude and longitude.
-  Future<Weather?> getWeather(
+  static Future<Weather?> getWeather(
       {required double lat, required double lon}) async {
     return _getWeather(url: '$baseUrl/weather?${_coordQueryString(lat, lon)}');
   }
 
   // Get weather by current user location.
-  Future<Weather?> getMyWeather() async {
+  static Future<Weather?> getMyWeather() async {
     final permissionError = await _handleLocationPermission();
     if (permissionError != null) {
       print(permissionError);
@@ -89,22 +89,37 @@ class ApiServices {
     return getWeather(lat: position.latitude, lon: position.longitude);
   }
 
-  // Get weather by city name
-  Future<Weather?> getWeatherByCity(
+  // Get weather by city name.
+  static Future<Weather?> getWeatherByCity(
       {required String city, String country = ''}) async {
     return _getWeather(
         url: '$baseUrl/weather?${_cityQueryString(city, country)}');
   }
 
-  // Get 5-day weather forecast in 3-hour increments based on latitude and longitude
-  Future<List<Weather>?> getForecast(
+  // Get 5-day weather forecast in 3-hour increments based on latitude and longitude.
+  static Future<List<Weather>?> getForecast(
       {required double lat, required double lon}) async {
     return _getForecast(
         url: '$baseUrl/forecast?${_coordQueryString(lat, lon)}');
   }
 
-  // Get 5-day weather forecast in 3-hour increments by city name
-  Future<List<Weather>?> getForecastByCity(
+  // // Get 5-day weather forecast in 3-hour increments based on user location.
+  static Future<List<Weather>?> getMyForecast() async {
+    final permissionError = await _handleLocationPermission();
+    if (permissionError != null) {
+      print(permissionError);
+      return null;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    return _getForecast(
+        url:
+            '$baseUrl/forecast?${_coordQueryString(position.latitude, position.longitude)}');
+  }
+
+  // Get 5-day weather forecast in 3-hour increments by city name.
+  static Future<List<Weather>?> getForecastByCity(
       {required String city, String country = ''}) async {
     return _getForecast(
         url: '$baseUrl/forecast?${_cityQueryString(city, country)}');

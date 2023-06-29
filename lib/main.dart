@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutterpractice/services/api_services.dart';
+import 'package:flutterpractice/screens/home_screen.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
-  ApiServices().getForecastByCity(city: 'seoul');
   runApp(const MyApp());
 }
 
@@ -19,14 +18,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Hello Fultter!'),
-        ),
-        body: const Center(
-          child: Text('Hello world!'),
-        ),
-      ),
+      home: HomeScreen(),
     );
   }
 }

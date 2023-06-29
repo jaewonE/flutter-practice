@@ -1,16 +1,17 @@
 class Weather {
-  final double lat;
-  final double lon;
+  final num lat;
+  final num lon;
   final String state;
   final String description;
   final String? icon;
-  final double temp;
-  final double feelsLike;
-  final double tempMin;
-  final double tempMax;
+  final num temp;
+  final num feelsLike;
+  final num tempMin;
+  final num tempMax;
+  final num? humidity;
   final String city;
 
-  final String? forecastTime;
+  final DateTime? forecastTime;
 
   Weather.fromJson(Map<String, dynamic> json)
       : this.lat = json['coord']['lat'],
@@ -22,11 +23,13 @@ class Weather {
         this.feelsLike = json['main']['feels_like'],
         this.tempMin = json['main']['temp_min'],
         this.tempMax = json['main']['temp_max'],
+        this.humidity = json['main']['humidity'],
         this.city = json['name'] ?? '',
-        this.forecastTime = json['dt_txt'];
+        this.forecastTime =
+            json['dt_txt'] != null ? DateTime.parse(json['dt_txt']) : null;
 
   void printInfo() {
     print(
-        'lat: $lat\nlon: $lon\ncity: $city\nstate: $state\ndescription: $description\nicon: ${icon ?? 'null'}\ntemp: $temp\nfeelsLike: $feelsLike\ntempMin: $tempMin\ntempMax: $tempMax\n${forecastTime ?? 'forecastTime: $forecastTime\n'}');
+        'lat: $lat\nlon: $lon\ncity: $city\nstate: $state\ndescription: $description\nicon: ${icon ?? 'null'}\ntemp: $temp\nfeelsLike: $feelsLike\ntempMin: $tempMin\ntempMax: $tempMax\nhumidity: ${humidity ?? 'null'}\n${forecastTime ?? 'forecastTime: $forecastTime\n'}');
   }
 }
