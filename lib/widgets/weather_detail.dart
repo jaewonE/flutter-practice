@@ -3,6 +3,7 @@ import 'package:flutterpractice/models/weather.dart';
 import 'package:flutterpractice/services/api_services.dart';
 import 'package:flutterpractice/widgets/forecast_status_bar.dart';
 import 'package:flutterpractice/widgets/weather_state_item.dart';
+import 'package:flutterpractice/util/date_util.dart';
 
 class WeatherDetail extends StatefulWidget {
   final String? city;
@@ -24,7 +25,16 @@ class _WeatherDetailState extends State<WeatherDetail> {
   @override
   void initState() {
     super.initState();
-    var city = widget.city;
+    requestWeather(widget.city);
+  }
+
+  @override
+  void dispose() {
+    showDetailDate.dispose();
+    super.dispose();
+  }
+
+  void requestWeather(String? city) {
     if (city == null) {
       futureWeather = ApiServices.getMyWeather();
       futureForecasts = ApiServices.getMyForecast();
@@ -34,22 +44,13 @@ class _WeatherDetailState extends State<WeatherDetail> {
     }
   }
 
-  @override
-  void dispose() {
-    showDetailDate.dispose();
-    super.dispose();
-  }
-
   void updateShowDetailDate(DateTime updateDate) {
     showDetailDate.value = updateDate;
   }
 
-  void refreshLocation() async {}
-
-  bool isSameDay(DateTime date1, DateTime date2) =>
-      date1.year == date2.year &&
-      date1.month == date2.month &&
-      date1.day == date2.day;
+  void refreshLocation() => setState(() {
+        requestWeather(widget.city);
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +65,14 @@ class _WeatherDetailState extends State<WeatherDetail> {
                   final Weather weather = weatherSnapshot.data!;
                   final List<Weather> forecasts = forecastsSnapshot.data!;
 
-                  DateTime startDate = forecasts[0].forecastTime!;
+                  DateTime startDate = forecasts[0].forecastTime;
                   DateTime endDate =
-                      forecasts[forecasts.length - 1].forecastTime!;
+                      forecasts[forecasts.length - 1].forecastTime;
                   final dateDiff = endDate.difference(startDate).inDays + 2;
 
-                  updateShowDetailDate(forecasts[0].forecastTime!);
+                  updateShowDetailDate(forecasts[0].forecastTime);
 
-                  // weather.printInfo();
+                  weather.printInfo();
 
                   return SingleChildScrollView(
                     child: Padding(
@@ -82,17 +83,18 @@ class _WeatherDetailState extends State<WeatherDetail> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Column(
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Hello world',
-                                      style: TextStyle(
+                                  Text(weather.city,
+                                      style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
                                           fontWeight: FontWeight.w600)),
-                                  SizedBox(height: 5),
-                                  Text('12 September, Sunday',
-                                      style: TextStyle(
+                                  const SizedBox(height: 5),
+                                  Text(
+                                      '${weather.forecastTime.day} ${DateUtility.getMonthName(weather.forecastTime.month)}, ${DateUtility.getWeekdayName(weather.forecastTime.weekday)}',
+                                      style: const TextStyle(
                                         color:
                                             Color.fromRGBO(255, 255, 255, 0.6),
                                         fontSize: 14,
@@ -120,37 +122,38 @@ class _WeatherDetailState extends State<WeatherDetail> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Column(
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.only(left: 8),
-                                    child: Text('18°',
-                                        style: TextStyle(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(' ${weather.temp.toInt()}°',
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 60,
                                           fontWeight: FontWeight.w900,
                                         )),
                                   ),
-                                  SizedBox(height: 2),
-                                  Text('Thunderstorm',
-                                      style: TextStyle(
+                                  const SizedBox(height: 2),
+                                  Text(weather.state,
+                                      style: const TextStyle(
                                         color:
                                             Color.fromRGBO(255, 255, 255, 0.6),
-                                        fontSize: 15,
+                                        fontSize: 16,
                                       )),
                                 ],
                               ),
                               Transform.translate(
-                                offset: const Offset(-5, 8),
+                                offset: const Offset(-5, 0),
                                 child: Transform.scale(
                                   scale: 1.6,
                                   child: SizedBox(
                                     width: 120,
                                     height: 120,
-                                    child: Image.network(
-                                        'https://openweathermap.org/img/wn/10d@4x.png'),
+                                    child: Image.network(Weather.getIconUrl(
+                                        icon: weather.icon,
+                                        size: WeatherIconSize.big)),
                                   ),
                                 ),
                               ),
@@ -176,21 +179,21 @@ class _WeatherDetailState extends State<WeatherDetail> {
                                         color: Colors.red.shade300,
                                       ),
                                       state: 'Highest',
-                                      value: '20°'),
+                                      value: '${weather.tempMax}°'),
                                   WeatherStateItem(
                                       icon: Icon(
                                         Icons.water_drop_outlined,
                                         color: Colors.blue.shade400,
                                       ),
                                       state: 'Humidity',
-                                      value: '84%'),
+                                      value: '${weather.humidity}%'),
                                   WeatherStateItem(
                                       icon: Icon(
                                         Icons.tag_faces_outlined,
                                         color: Colors.purple.shade300,
                                       ),
                                       state: 'FeelsLike',
-                                      value: '285.88'),
+                                      value: weather.feelsLike.toString()),
                                 ],
                               ),
                             ),
@@ -203,9 +206,11 @@ class _WeatherDetailState extends State<WeatherDetail> {
                                     showDetailDate: showDetailDate,
                                     updateShowDetailDate: updateShowDetailDate,
                                     forecasts: forecasts
-                                        .where((forecast) => isSameDay(
-                                            forecast.forecastTime!,
-                                            startDate.add(Duration(days: i))))
+                                        .where((forecast) =>
+                                            DateUtility.isSameDay(
+                                                forecast.forecastTime,
+                                                startDate
+                                                    .add(Duration(days: i))))
                                         .toList()),
                             ],
                           )

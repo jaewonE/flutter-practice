@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterpractice/models/weather.dart';
+import 'package:flutterpractice/util/date_util.dart';
 import 'package:flutterpractice/widgets/temp_by_time_item.dart';
 
 class ForecastStatusBar extends StatefulWidget {
@@ -20,43 +21,15 @@ class ForecastStatusBar extends StatefulWidget {
 class _ForecastStatusBarState extends State<ForecastStatusBar> {
   late final int minTemp;
   late final int maxTemp;
+  late final int forecastsLength;
 
   @override
   void initState() {
     super.initState();
-    findMinMaxTemp();
-  }
-
-  bool isSameDay(
-          DateTime? date1, DateTime? date2) =>
-      date1 == null || date2 == null
-          ? false
-          : date1.year == date2.year &&
-              date1.month == date2.month &&
-              date1.day == date2.day;
-
-  String getWeekdayName(int weekday) {
-    // 당일 기준으로 5일치를 가져옴으로 요일이 같다면 오늘이다.
-    if (DateTime.now().weekday == weekday) {
-      return 'Today';
+    forecastsLength = widget.forecasts.length;
+    if (forecastsLength > 0) {
+      findMinMaxTemp();
     }
-    switch (weekday) {
-      case 1:
-        return 'Monday';
-      case 2:
-        return 'Tuesday';
-      case 3:
-        return 'Wednesday';
-      case 4:
-        return 'Thursday';
-      case 5:
-        return 'Friday';
-      case 6:
-        return 'Saturday';
-      case 7:
-        return 'Sunday';
-    }
-    return '';
   }
 
   void findMinMaxTemp() {
@@ -72,16 +45,13 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
     maxTemp = max.toInt();
   }
 
-  String getIconUrl(String? icon) =>
-      'https://openweathermap.org/img/wn/${icon ?? '01d'}@2x.png';
-
   double getBarWidth() {
     double sum = 0;
     sum += minTemp;
     if (sum % 2 == 0) {
-      sum += widget.forecasts[0].forecastTime!.day.toDouble();
+      sum += widget.forecasts[0].forecastTime.day.toDouble();
     } else {
-      sum -= widget.forecasts[0].forecastTime!.day.toDouble();
+      sum -= widget.forecasts[0].forecastTime.day.toDouble();
     }
     if (sum % 2 == 0) {
       sum += maxTemp;
@@ -95,12 +65,14 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
 
   @override
   Widget build(BuildContext context) {
+    if (forecastsLength <= 0) return const SizedBox(height: 0);
+
     widget.showDetailDate.addListener(() {
       setState(() {});
     });
     return GestureDetector(
       onTap: () =>
-          widget.updateShowDetailDate(widget.forecasts[0].forecastTime!),
+          widget.updateShowDetailDate(widget.forecasts[0].forecastTime),
       child: Column(
         children: [
           Container(
@@ -119,7 +91,8 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
                   SizedBox(
                     width: 88,
                     child: Text(
-                      getWeekdayName(widget.forecasts[0].forecastTime!.weekday),
+                      DateUtility.getWeekdayName(
+                          widget.forecasts[0].forecastTime.weekday),
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -160,8 +133,8 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
                     child: SizedBox(
                       width: 20,
                       height: 20,
-                      child:
-                          Image.network(getIconUrl(widget.forecasts[0].icon)),
+                      child: Image.network(
+                          Weather.getIconUrl(icon: widget.forecasts[0].icon)),
                     ),
                   ),
                 ],
@@ -169,14 +142,14 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
             ),
           ),
           SizedBox(
-              height: isSameDay(widget.showDetailDate.value,
+              height: DateUtility.isSameDay(widget.showDetailDate.value,
                       widget.forecasts[0].forecastTime)
                   ? 12
                   : 0),
           AnimatedContainer(
               duration: const Duration(milliseconds: 400),
               curve: Curves.easeInOut,
-              height: isSameDay(widget.showDetailDate.value,
+              height: DateUtility.isSameDay(widget.showDetailDate.value,
                       widget.forecasts[0].forecastTime)
                   ? 120
                   : 0,
@@ -186,7 +159,7 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
                 itemBuilder: (context, index) {
                   Weather forecast = widget.forecasts[index];
                   return TempByTimeItem(
-                      hour: forecast.forecastTime!.hour,
+                      hour: forecast.forecastTime.hour,
                       weatherIcon: forecast.icon ?? '01d',
                       temp: forecast.temp);
                 },

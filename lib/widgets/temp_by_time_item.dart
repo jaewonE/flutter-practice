@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutterpractice/models/weather.dart';
 
 class TempByTimeItem extends StatelessWidget {
   final int hour;
   final String weatherIcon;
   final num temp;
-
-  static String getIconUrl(String? icon) =>
-      'https://openweathermap.org/img/wn/$icon@2x.png';
 
   const TempByTimeItem(
       {super.key,
@@ -47,7 +45,7 @@ class TempByTimeItem extends StatelessWidget {
               child: SizedBox(
                 width: 20,
                 height: 20,
-                child: Image.network(getIconUrl(weatherIcon)),
+                child: Image.network(Weather.getIconUrl(icon: weatherIcon)),
               ),
             ),
             const SizedBox(height: 16),
