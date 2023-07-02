@@ -16,24 +16,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final double mediaHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+        backgroundColor: const Color.fromRGBO(26, 29, 30, 1),
         body: SafeArea(
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          Container(
-            width: mediaWidth,
-            height: mediaHeight,
-            color: const Color.fromRGBO(26, 29, 30, 1),
-            child: const WeatherDetail(),
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              SizedBox(
+                width: mediaWidth,
+                height: mediaHeight,
+                child: const WeatherDetail(),
+              ),
+              SizedBox(
+                width: mediaWidth,
+                height: mediaHeight,
+                child: const CityList(),
+              ),
+            ],
           ),
-          Container(
-            width: mediaWidth,
-            height: mediaHeight,
-            color: const Color.fromRGBO(26, 29, 30, 1),
-            child: const CityList(),
-          ),
-        ],
-      ),
-    ));
+        ));
   }
 }

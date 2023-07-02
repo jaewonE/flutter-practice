@@ -39,6 +39,14 @@ class DateUtility {
     return weekday > 0 && weekday < 8 ? weekdays[weekday - 1] : '';
   }
 
-  static getMonthName(int month) =>
+  static String getMonthName(int month) =>
       month > 0 && month < 13 ? months[month - 1] : '';
+
+  // get string of DateTime : ex: 9:15 pm
+  static String getTimeString(DateTime date) {
+    var timeString = date.hour <= 12 ? '${date.hour}' : '${date.hour - 12}';
+    if (date.minute > 0) timeString += ':${date.minute}';
+    timeString += date.hour < 12 ? ' am' : ' pm';
+    return timeString;
+  }
 }

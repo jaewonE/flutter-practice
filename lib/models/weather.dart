@@ -12,7 +12,6 @@ class Weather {
   final num tempMax;
   final num? humidity;
   final String city;
-
   final DateTime forecastTime;
 
   Weather.fromJson(Map<String, dynamic> json)
