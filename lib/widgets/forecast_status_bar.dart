@@ -60,7 +60,7 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
     }
     if (sum == 0) sum = 44;
     if (sum < 0) sum *= -1;
-    return sum.toInt() % 43 + 30;
+    return sum.toInt() % 38 + 15;
   }
 
   @override
@@ -89,7 +89,7 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 88,
+                    width: 76,
                     child: Text(
                       DateUtility.getWeekdayName(
                           widget.forecasts[0].forecastTime.weekday),
@@ -106,7 +106,7 @@ class _ForecastStatusBarState extends State<ForecastStatusBar> {
                       )),
                   const SizedBox(width: 4),
                   Container(
-                    width: 88,
+                    width: 66,
                     alignment: Alignment.centerRight,
                     child: Container(
                       width: getBarWidth(),

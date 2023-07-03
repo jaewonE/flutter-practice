@@ -46,7 +46,6 @@ class ApiServices {
     if (res.statusCode != 200) return null;
 
     Weather weather = Weather.fromJson(jsonDecode(res.body));
-    // weather.printInfo();
     return weather;
   }
 
@@ -62,10 +61,6 @@ class ApiServices {
 
     for (var i = 0; i < weatherListJson.length; i++) {
       weatherList.add(Weather.fromJson({...weatherListJson[i], ...cityJson}));
-    }
-    for (var i = 0; i < weatherListJson.length; i++) {
-      weatherList[i].printInfo();
-      print('\n');
     }
     return weatherList;
   }

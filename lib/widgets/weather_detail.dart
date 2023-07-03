@@ -72,8 +72,6 @@ class _WeatherDetailState extends State<WeatherDetail> {
 
                   updateShowDetailDate(forecasts[0].forecastTime);
 
-                  weather.printInfo();
-
                   return SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(28),
