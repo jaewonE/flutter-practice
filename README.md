@@ -7,4 +7,4 @@
 
 2. 2_State_practice : Practice how to manage State in Flutter.
 
-3. 3_data-fetch-practice : Data fetch practice through webtoon app clone coding
+3. 3_data-fetch-practice : Data fetch practice through creating weather app
